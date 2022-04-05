@@ -13,17 +13,17 @@ import java.util.stream.Stream;
 @RestController
 public class StudentServiceApplication {
 
-    @GetMapping("/students")
-    public List<Student> getStudents() {
-        return Stream.of(new Student(101, "basant", "1", "B"),
-                        new Student(102, "Santosh", "2", "B"),
-                        new Student(103, "Ajay", "11", "C"))
-                .collect(Collectors.toList());
-    }
-
-
     public static void main(String[] args) {
         SpringApplication.run(StudentServiceApplication.class, args);
+    }
+
+    @GetMapping("/students")
+    public List<Student> getStudents() {
+        return Stream.of(
+                new Student(101, "basant", "1", "B"),
+                new Student(102, "Santosh", "2", "B"),
+                new Student(103, "Ajay", "11", "C")
+        ).collect(Collectors.toList());
     }
 
 }

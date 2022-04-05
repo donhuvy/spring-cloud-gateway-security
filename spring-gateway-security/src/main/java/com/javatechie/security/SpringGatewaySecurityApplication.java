@@ -19,17 +19,18 @@ import java.util.stream.Stream;
 @SpringBootApplication
 public class SpringGatewaySecurityApplication {
 
-
     @Autowired
     private RedisHashComponent redisHashComponent;
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringGatewaySecurityApplication.class, args);
+    }
 
     @PostConstruct
     public void initKeysToRedis() {
         List<ApiKey> apiKeys = new ArrayList<>();
-        apiKeys.add(new ApiKey("343C-ED0B-4137-B27E", Stream.of(AppConstants.STUDENT_SERVICE_KEY,
-                AppConstants.COURSE_SERVICE_KEY).collect(Collectors.toList())));
-        apiKeys.add(new ApiKey("FA48-EF0C-427E-8CCF", Stream.of(AppConstants.COURSE_SERVICE_KEY)
-                .collect(Collectors.toList())));
+        apiKeys.add(new ApiKey("343C-ED0B-4137-B27E", Stream.of(AppConstants.STUDENT_SERVICE_KEY, AppConstants.COURSE_SERVICE_KEY).collect(Collectors.toList())));
+        apiKeys.add(new ApiKey("FA48-EF0C-427E-8CCF", Stream.of(AppConstants.COURSE_SERVICE_KEY).collect(Collectors.toList())));
         List<Object> lists = redisHashComponent.hValues(AppConstants.RECORD_KEY);
         if (lists.isEmpty()) {
             apiKeys.forEach(k -> redisHashComponent.hSet(AppConstants.RECORD_KEY, k.getKey(), k));
@@ -40,16 +41,12 @@ public class SpringGatewaySecurityApplication {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route(AppConstants.STUDENT_SERVICE_KEY,
-						r -> r.path("/api/student-service/**")
-                        .filters(f -> f.stripPrefix(2)).uri("http://localhost:8081"))
+                        r -> r.path("/api/student-service/**")
+                                .filters(f -> f.stripPrefix(2)).uri("http://localhost:8081"))
                 .route(AppConstants.COURSE_SERVICE_KEY,
-						r -> r.path("/api/course-service/**")
-                        .filters(f -> f.stripPrefix(2)).uri("http://localhost:8082"))
+                        r -> r.path("/api/course-service/**")
+                                .filters(f -> f.stripPrefix(2)).uri("http://localhost:8082"))
                 .build();
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(SpringGatewaySecurityApplication.class, args);
     }
 
 }

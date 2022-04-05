@@ -18,7 +18,6 @@ public class RedisConfig {
         this.env = env;
     }
 
-
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
@@ -34,4 +33,5 @@ public class RedisConfig {
         template.setEnableTransactionSupport(true);
         return template;
     }
+
 }

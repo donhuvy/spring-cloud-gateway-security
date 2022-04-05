@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Student {
+
     private int id;
     private String name;
     private String rollNo;
     private String section;
+
 }

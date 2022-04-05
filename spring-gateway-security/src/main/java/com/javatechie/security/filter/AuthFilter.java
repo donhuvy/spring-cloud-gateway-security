@@ -22,22 +22,21 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class AuthFilter implements GlobalFilter , Ordered {
+public class AuthFilter implements GlobalFilter, Ordered {
 
     @Autowired
     private RedisHashComponent redisHashComponent;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        List<String> apiKeyHeader=exchange.getRequest().getHeaders().get("gatewaykey");
-        log.info("api key {} ",apiKeyHeader);
-        Route route=exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
-        String routeId=route!=null? route.getId() : null;
-
-        if(routeId ==null || CollectionUtils.isEmpty(apiKeyHeader) || !isAuthorize(routeId, apiKeyHeader.get(0))){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"you can't consume this service , Please validate your apikeys");
-        }return chain.filter(exchange);
-
+        List<String> apiKeyHeader = exchange.getRequest().getHeaders().get("gatewaykey");
+        log.info("api key {} ", apiKeyHeader);
+        Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
+        String routeId = route != null ? route.getId() : null;
+        if (routeId == null || CollectionUtils.isEmpty(apiKeyHeader) || !isAuthorize(routeId, apiKeyHeader.get(0))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "you can't consume this service , Please validate your apikeys");
+        }
+        return chain.filter(exchange);
     }
 
     @Override
@@ -45,13 +44,14 @@ public class AuthFilter implements GlobalFilter , Ordered {
         return Ordered.LOWEST_PRECEDENCE;
     }
 
-    private boolean isAuthorize(String routeId,String apiKey){
-        Object apiKeyObject=redisHashComponent.hGet(AppConstants.RECORD_KEY, apiKey);
-        if(apiKeyObject!=null){
-            ApiKey key= MapperUtils.objectMapper(apiKeyObject, ApiKey.class);
+    private boolean isAuthorize(String routeId, String apiKey) {
+        Object apiKeyObject = redisHashComponent.hGet(AppConstants.RECORD_KEY, apiKey);
+        if (apiKeyObject != null) {
+            ApiKey key = MapperUtils.objectMapper(apiKeyObject, ApiKey.class);
             return key.getServices().contains(routeId);
-        }else{
+        } else {
             return false;
         }
     }
+
 }
